@@ -1,0 +1,17 @@
+version: "3"
+
+services:
+  apptrix-backend:
+    container_name: apptrix-backend
+    build:
+      context: ../application
+      dockerfile: Dockerfile
+    ports:
+      - "8901:8000"
+    volumes:
+      - ../application:/srv/www/app/
+      - sqlite_value:/srv/www/app/database/
+    command: python manage.py runserver 0.0.0.0:8000
+
+volumes:
+  sqlite_value:

@@ -1,0 +1,29 @@
+version: "3"
+
+services:
+  apptrix-db:
+    container_name: ${POSTGRES_HOST}
+    image: postgres:13.0-alpine
+    restart: always
+    volumes:
+      - apptrix-db_value:/var/lib/postgresql/data/
+    env_file:
+      - ./.env
+    command: -p ${POSTGRES_PORT}
+
+  apptrix-backend:
+    build:
+      context: ../application
+      dockerfile: Dockerfile
+    ports:
+      - "8901:8000"
+    volumes:
+      - ../application:/srv/www/app/
+    command: python manage.py runserver 0.0.0.0:8000
+    env_file:
+      - ./.env
+    depends_on:
+      - apptrix-db
+
+volumes:
+  apptrix-db_value:
