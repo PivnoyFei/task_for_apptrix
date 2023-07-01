@@ -4,6 +4,7 @@ from pytils.translit import slugify
 
 from core.fields import WEBPField
 from core.models import ThumbnailMixin
+from core.services import image_watermark
 from core.validators import validate_image
 from users.managers import CustomUserManager
 
@@ -76,3 +77,10 @@ class CustomUser(AbstractBaseUser, PermissionsMixin, ThumbnailMixin):
 
     def get_thumbnail(self, size):
         return self._get_thumbnail(size, self._image)
+
+    def save(self, *args, **kwargs):
+        super().save()
+        if not self._image:
+            return
+        image = image_watermark(self._image.path)
+        image.save(self._image.path)

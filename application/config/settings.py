@@ -142,6 +142,7 @@ if all((EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD)):
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 IMAGE_UPLOAD_MAX_SIZE = (1920, 1080)
+WATERMARK_PATH = BASE_DIR / 'static_build' / 'watermark.JPG'
 
 if DEBUG:
 
