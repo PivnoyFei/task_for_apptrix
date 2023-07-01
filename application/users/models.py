@@ -74,5 +74,5 @@ class CustomUser(AbstractBaseUser, PermissionsMixin, ThumbnailMixin):
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
 
-    def get_thumbnail(self, size, image):
+    def get_thumbnail(self, size):
         return self._get_thumbnail(size, self._image)

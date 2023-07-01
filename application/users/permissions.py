@@ -6,12 +6,14 @@ from users import ACCESS_RIGHTS
 
 class StaffMixin:
     """Дает доступ для редактора и администратор"""
+
     def check_perm(self, user):
         return user.is_active and (user.is_staff or user.is_superuser)
 
 
 class UpdateAndReadOnlyAdminMixin:
     """Дает доступ на просмотр и редактирование обьектов."""
+
     def has_change_permission(self, request, obj=None):
         return self.check_perm(request.user)
 
@@ -22,6 +24,7 @@ class UpdateAndReadOnlyAdminMixin:
 class StaffRequiredUserAdminMixin(StaffMixin, UpdateAndReadOnlyAdminMixin):
     """Накладывает ограничение на редактирование собственного профиля,
     скрывает других пользователей, для всех кроме администратор."""
+
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
         if request.user.is_superuser:

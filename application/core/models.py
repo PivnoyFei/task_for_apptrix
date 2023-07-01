@@ -8,7 +8,7 @@ class ThumbnailMixin:
             return get_thumbnail(
                 image,
                 size,
-                quality=85,
+                quality=75,
                 crop='center',
                 format='WEBP',
             )

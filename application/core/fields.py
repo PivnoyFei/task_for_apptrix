@@ -9,8 +9,12 @@ from config.settings import IMAGE_UPLOAD_MAX_SIZE
 
 
 class WEBPFieldFile(ImageFieldFile):
+    """Класс наследник от ImageFieldFile, который производит
+    сохранение файла с автоматической конвертацией в WEBP формат."""
+
     def save(self, name, content, save=True):
-        """Сохраняет загруженные фото в формате WEBP
+        """Переопределён метод save().
+        Сохраняет загруженные фото в формате WEBP
         уменьшает размер изображения с сохранением пропорций."""
         content.file.seek(0)
         filename, extension = name.rsplit('.', 1)
@@ -36,4 +40,6 @@ class WEBPFieldFile(ImageFieldFile):
 
 
 class WEBPField(models.ImageField):
+    """Класс наследник от ImageField, который использует WEBPFieldFile вместо ImageFieldFile."""
+
     attr_class = WEBPFieldFile

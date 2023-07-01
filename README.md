@@ -1,5 +1,3 @@
-[![Build Status](https://github.com/PivnoyFei/task_for_apptrix/actions/workflows/apptrix_actions.yml/badge.svg)](https://github.com/PivnoyFei/task_for_apptrix/actions/workflows/apptrix_actions.yml)
-
 <h1 align="center"><a target="_blank" href="">Тестовое для Apptrix</a></h1>
 
 ### Стек: 
