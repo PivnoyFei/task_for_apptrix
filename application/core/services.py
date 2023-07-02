@@ -1,7 +1,8 @@
+from django.core.mail import send_mail
 from django.utils.safestring import mark_safe
 from PIL import Image, ImageFilter
 
-from config.settings import WATERMARK_PATH
+from config.settings import EMAIL_HOST_USER, WATERMARK_PATH
 
 
 def image_thumb(image):
@@ -40,3 +41,10 @@ def image_watermark(image):
     watermark.putalpha(50)
     image.paste(watermark, (width // 4, height // 4), watermark)
     return image
+
+
+def match_send_mail(user_one, user_two):
+    for sender, receiver in ((user_one, user_two), (user_two, user_one)):
+        subject = 'У вас новая симпатия.'
+        message = f'Вы понравились пользователю {sender.first_name}! Почта участника: {sender.email}'
+        send_mail(subject, message, EMAIL_HOST_USER, [receiver.email])

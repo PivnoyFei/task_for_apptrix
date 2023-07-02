@@ -1,3 +1,4 @@
+import logging
 from io import BytesIO
 
 from django.core.files.base import ContentFile
@@ -7,6 +8,12 @@ from PIL import Image
 
 from config.settings import IMAGE_UPLOAD_MAX_SIZE
 from core.services import image_upload_max_size
+
+logging.basicConfig(
+    level=logging.ERROR,
+    format='%(asctime)s, %(levelname)s, %(name)s, %(message)s',
+    filename="py_log.log",
+)
 
 
 class WEBPFieldFile(ImageFieldFile):
@@ -21,7 +28,10 @@ class WEBPFieldFile(ImageFieldFile):
         filename, extension = name.rsplit('.', 1)
         if '/' not in name or extension.upper() != 'WEBP':
             image = Image.open(content.file).convert('RGB')
-            image = image_upload_max_size(image, IMAGE_UPLOAD_MAX_SIZE)
+            try:
+                image = image_upload_max_size(image, IMAGE_UPLOAD_MAX_SIZE)
+            except Exception as e:
+                logging.error(f"=== image_upload_max_size === {e}")
             image_bytes = BytesIO()
             image.save(image_bytes, format="WEBP", quality=85)
             image_content_file = ContentFile(image_bytes.getvalue(), f'{filename}.webp')

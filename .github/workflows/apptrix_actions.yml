@@ -11,6 +11,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: psf/black@stable
+      - name: Install python
+        uses: actions/setup-python@v4
         with:
-          options: ". --check --skip-string-normalization"
+          python-version: '3.11'
+
+      - name: Set up Poetry
+        uses: abatilo/actions-poetry@v2
+
+      - name: Install deps
+        run: |
+          cd application
+          poetry install
+
+      - name: Check ruff
+        run: |
+          cd application
+          poetry run ruff check .

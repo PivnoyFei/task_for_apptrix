@@ -3,7 +3,7 @@ from django.db import models
 from pytils.translit import slugify
 
 from core.fields import WEBPField
-from core.models import ThumbnailMixin
+from core.models import ThumbnailMixin, Timestamps
 from core.services import image_watermark
 from core.validators import validate_image
 from users.managers import CustomUserManager
@@ -15,10 +15,9 @@ def get_upload_path(self, filename):
 
 class CustomUser(AbstractBaseUser, PermissionsMixin, ThumbnailMixin):
     GENDERS = (
-        ("m", "Мужчина"),
-        ("f", "Женщина"),
+        ('M', 'Мужчина'),
+        ('F', 'Женщина'),
     )
-
     first_name = models.CharField(
         'имя',
         max_length=256,
@@ -27,7 +26,11 @@ class CustomUser(AbstractBaseUser, PermissionsMixin, ThumbnailMixin):
         'фамилия',
         max_length=256,
     )
-    gender = models.CharField("Пол", max_length=1, choices=GENDERS)
+    gender = models.CharField(
+        'пол',
+        max_length=1,
+        choices=GENDERS,
+    )
     email = models.EmailField(
         'почтовый адрес',
         unique=True,
@@ -79,8 +82,49 @@ class CustomUser(AbstractBaseUser, PermissionsMixin, ThumbnailMixin):
         return self._get_thumbnail(size, self._image)
 
     def save(self, *args, **kwargs):
-        super().save()
+        self.first_name = self.first_name.title()
+        self.last_name = self.last_name.title()
+        super().save(*args, **kwargs)
         if not self._image:
             return
         image = image_watermark(self._image.path)
         image.save(self._image.path)
+
+
+class Match(Timestamps):
+    LIKE = (
+        ('NA', 'Нет ответа'),
+        ('OK', 'Взаимно!'),
+        ('NO', 'Не взаимно'),
+    )
+    sender = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        related_name='sender',
+        verbose_name='отправитель',
+    )
+    receiver = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        related_name='receiver',
+        verbose_name='получатель',
+    )
+    is_sympathy = models.CharField(
+        'взаимная симпатия',
+        max_length=2,
+        choices=LIKE,
+        default='NA',
+    )
+
+    class Meta:
+        verbose_name = 'взаимная симпатия'
+        verbose_name_plural = 'взаимные симпатии'
+        constraints = (
+            models.UniqueConstraint(
+                fields=(
+                    'sender',
+                    'receiver',
+                ),
+                name='unique_match',
+            ),
+        )

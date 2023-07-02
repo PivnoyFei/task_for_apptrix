@@ -3,10 +3,10 @@ from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
-from django.core.exceptions import ValidationError
 
 from core.services import image_thumb
 from users import ACCESS_RIGHTS
+from users.models import Match
 from users.permissions import StaffRequiredUserAdminMixin
 
 User = get_user_model()
@@ -130,3 +130,17 @@ class UserAdmin(StaffRequiredUserAdminMixin, BaseUserAdmin):
     @admin.display(description='миниатюра')
     def get_thumb(self, obj):
         return image_thumb(obj._image)
+
+
+@admin.register(Match)
+class MatchAdmin(admin.ModelAdmin):
+    list_display = (
+        'sender',
+        'receiver',
+        'is_sympathy',
+    )
+    readonly_fields = (
+        'sender',
+        'receiver',
+        'is_sympathy',
+    )

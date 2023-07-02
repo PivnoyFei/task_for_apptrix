@@ -1,4 +1,6 @@
+from django.apps import apps
 from django.contrib.auth.base_user import BaseUserManager
+from django.db.models import Prefetch
 
 
 class CustomUserManager(BaseUserManager):
@@ -28,4 +30,19 @@ class CustomUserManager(BaseUserManager):
             is_staff=True,
             is_superuser=True,
             **kwargs,
+        )
+
+    def match(self, user_sender, user_receiver):
+        sender = Prefetch(
+            'sender',
+            apps.get_model('users', 'Match')
+            .objects.only('id', 'is_sympathy')
+            .filter(receiver=user_receiver),
+            to_attr='user_sender',
+        )
+        return (
+            self.filter(id=user_sender, is_active=True)
+            .prefetch_related(sender)
+            .only('id', 'first_name', 'email')
+            .first()
         )
