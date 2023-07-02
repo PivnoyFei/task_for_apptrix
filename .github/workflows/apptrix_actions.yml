@@ -1,0 +1,30 @@
+name: CI/CD workflow
+
+on:
+  push:
+    branches: [ "main", "dev" ]
+  pull_request:
+    branches: [ "dev" ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Set up Poetry
+        uses: abatilo/actions-poetry@v2
+
+      - name: Install deps
+        run: |
+          cd application
+          poetry install
+
+      - name: Check black
+        run: |
+          cd application
+          poetry run black .
