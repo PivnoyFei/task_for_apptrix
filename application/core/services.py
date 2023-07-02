@@ -1,4 +1,9 @@
+from decimal import Decimal
+from math import cos, radians, sqrt
+
 from django.core.mail import send_mail
+from django.db.models import F
+from django.db.models.functions import Cos, Radians, Sqrt
 from django.utils.safestring import mark_safe
 from PIL import Image, ImageFilter
 
@@ -48,3 +53,19 @@ def match_send_mail(user_one, user_two):
         subject = 'У вас новая симпатия.'
         message = f'Вы понравились пользователю {sender.first_name}! Почта участника: {sender.email}'
         send_mail(subject, message, EMAIL_HOST_USER, [receiver.email])
+
+
+def get_distance(lat1, lon1, lat2, lon2):
+    lon1, lat1, lon2, lat2 = map(radians, (lon1, lat1, lon2, lat2))
+    x = (lon2 - lon1) * cos(0.5 * (lat2 + lat1))
+    y = lat2 - lat1
+    km = 6371 * sqrt(x * x + y * y)  # 6371 - радиус земли
+    return round(km, 1)
+
+
+def get_sql_distance(longitude, latitude):
+    x = (Radians(F('longitude')) - longitude) * Cos(
+        Decimal('0.5') * (Radians(F('latitude')) + latitude)
+    )
+    y = Radians(F('latitude')) - latitude
+    return 6371 * Sqrt(x * x + y * y)  # 6371 - радиус земли

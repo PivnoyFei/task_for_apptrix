@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
 from rest_framework.decorators import action
@@ -7,8 +8,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
+from api.users.filters import UserFilter
 from api.users.serializers import UserCreateSerializer, UserSerializer
-from core.services import match_send_mail
+from core.services import get_distance, match_send_mail
 from users.models import CustomUser, Match
 
 
@@ -18,7 +20,7 @@ class UserCreateViewSet(GenericViewSet, CreateModelMixin):
 
 
 class MatchViewSet(RetrieveModelMixin, GenericViewSet):
-    http_method_names = ['put']
+    http_method_names = ['get', 'put']
 
     @action(detail=True, methods=('put',), permission_classes=(IsAuthenticated,))
     def match(self, request, pk=None):
@@ -31,7 +33,7 @@ class MatchViewSet(RetrieveModelMixin, GenericViewSet):
                             status=status.HTTP_200_OK,
                         )
                     Match.objects.filter(id=pk).update(is_sympathy='OK')
-                    match_send_mail(request.user, receiver[0])
+                    match_send_mail(request.user, receiver)
                     return Response(
                         {'detail': 'Взаимность!.'},
                         status=status.HTTP_200_OK,
@@ -55,9 +57,21 @@ class MatchViewSet(RetrieveModelMixin, GenericViewSet):
 
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
+    @action(detail=True, methods=('get',), permission_classes=(IsAuthenticated,))
+    def distance(self, request, pk=None):
+        sen = request.user
+        rec = get_object_or_404(CustomUser, id=self.kwargs.get('pk'))
+
+        if all((sen.latitude, sen.longitude, rec.latitude, rec.longitude)):
+            km = get_distance(sen.latitude, sen.longitude, rec.latitude, rec.longitude)
+            return Response({'detail': f'{km} км от вас.'})
+        return Response({'detail': 'У пользователя отключена геопозиция.'})
+
 
 class UserListAPIView(ListAPIView):
-    queryset = CustomUser.objects.cactom()
     serializer_class = UserSerializer
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('gender', 'first_name', 'last_name')
+    filterset_class = UserFilter
+
+    def get_queryset(self):
+        return CustomUser.objects.cactom(self.request.user)

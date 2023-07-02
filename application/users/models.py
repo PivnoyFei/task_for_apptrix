@@ -44,6 +44,20 @@ class CustomUser(AbstractBaseUser, PermissionsMixin, ThumbnailMixin):
             validate_image,
         ],
     )
+    latitude = models.DecimalField(
+        'широта',
+        decimal_places=7,
+        max_digits=9,
+        blank=True,
+        null=True,
+    )
+    longitude = models.DecimalField(
+        'долгота',
+        decimal_places=7,
+        max_digits=9,
+        blank=True,
+        null=True,
+    )
     is_staff = models.BooleanField(
         'редактор',
         default=False,

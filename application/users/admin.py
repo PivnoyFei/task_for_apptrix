@@ -87,6 +87,7 @@ class UserAdmin(StaffRequiredUserAdminMixin, BaseUserAdmin):
                     ('last_name', 'first_name'),
                     ('email', 'gender'),
                     ('_image', 'get_thumb'),
+                    ('latitude', 'longitude'),
                     'password',
                 )
             },
@@ -109,6 +110,7 @@ class UserAdmin(StaffRequiredUserAdminMixin, BaseUserAdmin):
                     ('last_name', 'first_name'),
                     ('email', 'gender'),
                     ('_image', 'get_thumb'),
+                    ('latitude', 'longitude'),
                     ('is_staff', 'is_superuser'),
                     'is_active',
                     ('password1', 'password2'),

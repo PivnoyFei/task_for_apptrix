@@ -21,6 +21,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
 class UserSerializer(DjoserUserSerializer):
     image = CroppedImage(img_size='320x320', source='_image')
     gender = serializers.SerializerMethodField()
+    distance = serializers.CharField()
 
     class Meta:
         model = CustomUser
@@ -31,7 +32,13 @@ class UserSerializer(DjoserUserSerializer):
             'gender',
             'email',
             'image',
+            'distance',
         )
 
     def get_gender(self, obj):
         return obj.get_gender_display()
+
+    def to_representation(self, instance):
+        data = super(UserSerializer, self).to_representation(instance)
+        data['distance'] = round(instance.distance, 1) if instance.distance else 0
+        return data

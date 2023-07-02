@@ -1,6 +1,11 @@
+from decimal import Decimal
+
 from django.apps import apps
 from django.contrib.auth.base_user import BaseUserManager
-from django.db.models import Prefetch
+from django.db.models import Case, Prefetch, When
+from django.db.models.functions import Radians
+
+from core.services import get_sql_distance
 
 
 class CustomUserManager(BaseUserManager):
@@ -47,12 +52,20 @@ class CustomUserManager(BaseUserManager):
             .first()
         )
 
-    def cactom(self):
-        return self.only(
+    def cactom(self, user):
+        longitude = Radians(user.longitude)
+        latitude = Radians(user.latitude)
+        distance = get_sql_distance(longitude, latitude)
+
+        return self.annotate(
+            distance=Case(When(longitude=None, then=Decimal('0')), default=distance)
+        ).only(
             'id',
             'first_name',
             'last_name',
             'gender',
             'email',
             '_image',
+            'latitude',
+            'longitude',
         )
