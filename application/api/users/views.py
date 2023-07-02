@@ -1,11 +1,13 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
 from rest_framework.decorators import action
+from rest_framework.generics import ListAPIView
 from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from api.users.serializers import UserCreateSerializer
+from api.users.serializers import UserCreateSerializer, UserSerializer
 from core.services import match_send_mail
 from users.models import CustomUser, Match
 
@@ -52,3 +54,10 @@ class MatchViewSet(RetrieveModelMixin, GenericViewSet):
                 return Response({'detail': 'Взаимность!.'}, status=status.HTTP_200_OK)
 
         return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserListAPIView(ListAPIView):
+    queryset = CustomUser.objects.cactom()
+    serializer_class = UserSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filterset_fields = ('gender', 'first_name', 'last_name')

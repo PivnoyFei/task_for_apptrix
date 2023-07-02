@@ -46,3 +46,13 @@ class CustomUserManager(BaseUserManager):
             .only('id', 'first_name', 'email')
             .first()
         )
+
+    def cactom(self):
+        return self.only(
+            'id',
+            'first_name',
+            'last_name',
+            'gender',
+            'email',
+            '_image',
+        )

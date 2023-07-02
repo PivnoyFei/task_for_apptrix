@@ -24,7 +24,7 @@ jobs:
           cd application
           poetry install
 
-      - name: Check ruff
+      - name: Check black
         run: |
           cd application
-          poetry run ruff check .
+          poetry run black .
