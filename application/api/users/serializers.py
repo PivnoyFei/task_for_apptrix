@@ -2,7 +2,19 @@ from djoser.serializers import UserSerializer as DjoserUserSerializer
 from rest_framework import serializers
 
 from api.core.fields import CroppedImage
-from users.models import CustomUser
+from users.models import CustomUser, Match
+
+
+class MatchSerializer(serializers.ModelSerializer):
+    sender = serializers.CharField(read_only=True)
+    receiver = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = Match
+        fields = (
+            'sender',
+            'receiver',
+        )
 
 
 class UserCreateSerializer(serializers.ModelSerializer):

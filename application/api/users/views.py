@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from api.users.filters import UserFilter
-from api.users.serializers import UserCreateSerializer, UserSerializer
+from api.users.serializers import MatchSerializer, UserCreateSerializer, UserSerializer
 from core.services import get_distance, match_send_mail
 from users.models import CustomUser, Match
 
@@ -21,6 +21,7 @@ class UserCreateViewSet(GenericViewSet, CreateModelMixin):
 
 class MatchViewSet(RetrieveModelMixin, GenericViewSet):
     http_method_names = ['get', 'put']
+    serializer_class = MatchSerializer
 
     @action(detail=True, methods=('put',), permission_classes=(IsAuthenticated,))
     def match(self, request, pk=None):
